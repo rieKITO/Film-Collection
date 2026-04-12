@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Film Collection</string>
+    <string name="top_bar_title">Коллекция фильмов</string>
+    <string name="fab_add_film">Добавить фильм</string>
+    <string name="empty_collection_title">Коллекция пуста</string>
+    <string name="empty_collection_description">Нажмите «+», чтобы добавить первый фильм.</string>
+    <string name="dialog_add_film_title">Добавить фильм</string>
+    <string name="dialog_edit_film_title">Редактировать фильм</string>
+    <string name="dialog_delete_film_title">Удалить фильм?</string>
+    <string name="dialog_delete_film_message">Удалить «%1$s» из коллекции?</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_save">Сохранить</string>
+    <string name="action_edit">Редактировать</string>
+    <string name="label_title">Название</string>
+    <string name="label_year">Год выпуска</string>
+    <string name="label_genre">Жанр</string>
+    <string name="label_country">Страна</string>
+    <string name="label_director">Режиссёр</string>
+    <string name="error_title_required">Введите название фильма</string>
+    <string name="error_year_invalid">Введите год (%1$d–%2$d)</string>
+    <string name="error_genre_required">Укажите жанр</string>
+    <string name="error_country_required">Укажите страну</string>
+    <string name="error_director_required">Укажите режиссёра</string>
+    <string name="film_subtitle">%1$s • %2$s</string>
+    <string name="film_director">Режиссёр: %1$s</string>
+    <string name="film_title_with_year">%1$s (%2$d)</string>
+</resources>
