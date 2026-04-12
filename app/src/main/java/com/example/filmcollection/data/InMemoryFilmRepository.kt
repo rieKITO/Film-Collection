@@ -1,6 +1,7 @@
 package com.example.filmcollection.data
 
 import com.example.filmcollection.model.Film
+import java.util.concurrent.atomic.AtomicLong
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -11,7 +12,7 @@ class InMemoryFilmRepository(
     private val _films = MutableStateFlow(initialFilms)
     override val films: StateFlow<List<Film>> = _films
 
-    private var nextId: Long = (initialFilms.maxOfOrNull { it.id } ?: 0L) + 1L
+    private val nextId = AtomicLong((initialFilms.maxOfOrNull { it.id } ?: 0L) + 1L)
 
     override fun addFilm(
         title: String,
@@ -21,7 +22,7 @@ class InMemoryFilmRepository(
         director: String,
     ) {
         val film = Film(
-            id = nextId++,
+            id = nextId.getAndIncrement(),
             title = title,
             year = year,
             genre = genre,
