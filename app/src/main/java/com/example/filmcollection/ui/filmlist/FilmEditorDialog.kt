@@ -141,15 +141,17 @@ internal fun FilmEditorDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    showErrors = true
-                    if (!canSave) return@TextButton
-                    onSave(
-                        draft.title.trim(),
-                        parsedYear!!,
-                        draft.genre.trim(),
-                        draft.country.trim(),
-                        draft.director.trim(),
-                    )
+                    if (canSave && parsedYear != null) {
+                        onSave(
+                            draft.title.trim(),
+                            parsedYear,
+                            draft.genre.trim(),
+                            draft.country.trim(),
+                            draft.director.trim(),
+                        )
+                    } else {
+                        showErrors = true
+                    }
                 },
             ) {
                 Text(text = stringResource(R.string.action_save))

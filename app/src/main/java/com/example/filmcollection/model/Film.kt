@@ -7,5 +7,7 @@ data class Film(
     val genre: String,
     val country: String,
     val director: String,
+    val rating: Int? = null,
+    val watchStatus: WatchStatus = WatchStatus.NOT_WATCHED,
+    val imageResId: Int? = null,
 )
-

@@ -12,10 +12,9 @@ interface FilmRepository {
         genre: String,
         country: String,
         director: String,
-    )
+    ): Film
 
     fun updateFilm(film: Film)
 
     fun deleteFilm(id: Long)
 }
-

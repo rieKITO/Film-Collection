@@ -20,7 +20,7 @@ class InMemoryFilmRepository(
         genre: String,
         country: String,
         director: String,
-    ) {
+    ): Film {
         val film = Film(
             id = nextId.getAndIncrement(),
             title = title,
@@ -30,6 +30,7 @@ class InMemoryFilmRepository(
             director = director,
         )
         _films.update { it + film }
+        return film
     }
 
     override fun updateFilm(film: Film) {
@@ -42,4 +43,3 @@ class InMemoryFilmRepository(
         _films.update { current -> current.filterNot { it.id == id } }
     }
 }
-

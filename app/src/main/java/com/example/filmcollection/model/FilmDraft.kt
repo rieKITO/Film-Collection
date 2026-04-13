@@ -7,4 +7,3 @@ data class FilmDraft(
     val country: String = "",
     val director: String = "",
 )
-

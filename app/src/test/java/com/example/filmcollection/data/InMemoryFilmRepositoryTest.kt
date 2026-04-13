@@ -1,6 +1,5 @@
 package com.example.filmcollection.data
 
-import kotlinx.coroutines.flow.first
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -19,7 +18,7 @@ class InMemoryFilmRepositoryTest {
             director = "Christopher Nolan",
         )
 
-        val films = repository.films.first()
+        val films = repository.films.value
         assertEquals(1, films.size)
         assertEquals("Interstellar", films.first().title)
     }
@@ -34,11 +33,11 @@ class InMemoryFilmRepositoryTest {
             country = "UK",
             director = "Director A",
         )
-        val existing = repository.films.first().first()
+        val existing = repository.films.value.first()
 
         repository.updateFilm(existing.copy(title = "New Title"))
 
-        val updated = repository.films.first().first()
+        val updated = repository.films.value.first()
         assertEquals("New Title", updated.title)
     }
 
@@ -52,11 +51,11 @@ class InMemoryFilmRepositoryTest {
             country = "France",
             director = "Director B",
         )
-        val existing = repository.films.first().first()
+        val existing = repository.films.value.first()
 
         repository.deleteFilm(existing.id)
 
-        val films = repository.films.first()
+        val films = repository.films.value
         assertTrue(films.isEmpty())
     }
 }
