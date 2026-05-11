@@ -33,10 +33,10 @@ fun FilmNavHost(
         composable(
             route = Screen.FilmDetail.route,
             arguments = listOf(
-                navArgument(Screen.FilmDetail.ARG_FILM_ID) { type = NavType.LongType },
+                navArgument(Screen.FilmDetail.ARG_FILM_ID) { type = NavType.StringType },
             ),
         ) { backStackEntry ->
-            val filmId = backStackEntry.arguments?.getLong(Screen.FilmDetail.ARG_FILM_ID)
+            val filmId = backStackEntry.arguments?.getString(Screen.FilmDetail.ARG_FILM_ID)
                 ?: return@composable
             FilmDetailScreen(
                 filmId = filmId,

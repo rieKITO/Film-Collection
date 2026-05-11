@@ -11,15 +11,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.filmcollection.data.FilmRepository
 import com.example.filmcollection.data.InMemoryFilmRepository
-import kotlinx.coroutines.flow.collectLatest
+import com.example.filmcollection.data.remote.RetrofitFilmRemoteDataSource
 import com.example.filmcollection.navigation.FilmNavHost
+import com.example.filmcollection.network.NetworkModule
 import com.example.filmcollection.ui.theme.FilmCollectionTheme
 import com.example.filmcollection.viewmodel.FilmCollectionViewModel
 import com.example.filmcollection.viewmodel.FilmCollectionViewModelFactory
+import kotlinx.coroutines.flow.collectLatest
 
 class MainActivity : ComponentActivity() {
     private val repository: FilmRepository by lazy {
-        InMemoryFilmRepository()
+        InMemoryFilmRepository(
+            remoteDataSource = RetrofitFilmRemoteDataSource(NetworkModule.filmApi),
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

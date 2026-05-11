@@ -1,6 +1,7 @@
 package com.example.filmcollection.ui.filmlist
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,10 +10,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -20,7 +23,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,24 +40,47 @@ import com.example.filmcollection.R
 import com.example.filmcollection.model.Film
 import com.example.filmcollection.model.FilmDraft
 import com.example.filmcollection.viewmodel.FilmCollectionViewModel
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun FilmListScreen(
     viewModel: FilmCollectionViewModel,
     snackbarHostState: SnackbarHostState,
-    onFilmClick: (Long) -> Unit,
+    onFilmClick: (String) -> Unit,
 ) {
     val films by viewModel.films.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     var showAddDialog by remember { mutableStateOf(false) }
     var filmToDelete: Film? by remember { mutableStateOf(null) }
 
     val snackbarAdded = stringResource(R.string.snackbar_film_added)
     val snackbarDeleted = stringResource(R.string.snackbar_film_deleted)
+    val snackbarRefreshError = stringResource(R.string.snackbar_refresh_error)
+
+    LaunchedEffect(Unit) {
+        viewModel.refreshErrors.collectLatest {
+            snackbarHostState.showSnackbar(snackbarRefreshError)
+        }
+    }
+
+    val pullToRefreshState = rememberPullToRefreshState()
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(text = stringResource(R.string.top_bar_title)) }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(text = stringResource(R.string.top_bar_title)) },
+                actions = {
+                    IconButton(onClick = { viewModel.refresh() }) {
+                        Icon(
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = stringResource(R.string.action_refresh),
+                        )
+                    }
+                },
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddDialog = true }) {
                 Icon(
@@ -62,41 +91,32 @@ fun FilmListScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
-        if (films.isEmpty()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = stringResource(R.string.empty_collection_title),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Text(
-                    text = stringResource(R.string.empty_collection_description),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                items(
-                    items = films,
-                    key = { it.id },
-                ) { film ->
-                    FilmCard(
-                        film = film,
-                        onClick = { onFilmClick(film.id) },
-                        onDelete = { filmToDelete = film },
-                    )
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = { viewModel.refresh() },
+            state = pullToRefreshState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+        ) {
+            if (films.isEmpty()) {
+                EmptyState()
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    items(
+                        items = films,
+                        key = { it.id },
+                    ) { film ->
+                        FilmCard(
+                            film = film,
+                            onClick = { onFilmClick(film.id) },
+                            onDelete = { filmToDelete = film },
+                        )
+                    }
                 }
             }
         }
@@ -147,5 +167,28 @@ fun FilmListScreen(
                 }
             },
         )
+    }
+}
+
+@Composable
+private fun EmptyState() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = stringResource(R.string.empty_collection_title),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                text = stringResource(R.string.empty_collection_description),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
     }
 }

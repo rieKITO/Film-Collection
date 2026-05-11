@@ -16,5 +16,7 @@ interface FilmRepository {
 
     fun updateFilm(film: Film)
 
-    fun deleteFilm(id: Long)
+    fun deleteFilm(id: String)
+
+    suspend fun refresh(): Result<Unit>
 }

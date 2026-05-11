@@ -1,7 +1,7 @@
 package com.example.filmcollection.model
 
 data class Film(
-    val id: Long,
+    val id: String,
     val title: String,
     val year: Int,
     val genre: String,
@@ -10,4 +10,5 @@ data class Film(
     val rating: Int? = null,
     val watchStatus: WatchStatus = WatchStatus.NOT_WATCHED,
     val imageResId: Int? = null,
+    val isRemote: Boolean = false,
 )

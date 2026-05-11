@@ -57,7 +57,7 @@ import com.example.filmcollection.viewmodel.FilmCollectionViewModel
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun FilmDetailScreen(
-    filmId: Long,
+    filmId: String,
     viewModel: FilmCollectionViewModel,
     snackbarHostState: SnackbarHostState,
     onBack: () -> Unit,

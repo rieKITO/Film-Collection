@@ -44,6 +44,10 @@
     <string name="snackbar_film_updated">Изменения сохранены</string>
     <string name="snackbar_rating_saved">Оценка сохранена</string>
     <string name="snackbar_status_updated">Статус обновлён</string>
+    <string name="snackbar_refresh_error">Не удалось загрузить данные с сервера</string>
+
+    <!-- Refresh -->
+    <string name="action_refresh">Обновить</string>
 
     <!-- Accessibility -->
     <string name="star_filled">Звезда %1$d из %2$d, заполнена</string>
