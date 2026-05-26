@@ -1,12 +1,12 @@
 package com.example.filmcollection.data
 
 import com.example.filmcollection.model.Film
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 
 interface FilmRepository {
-    val films: StateFlow<List<Film>>
+    val films: Flow<List<Film>>
 
-    fun addFilm(
+    suspend fun addFilm(
         title: String,
         year: Int,
         genre: String,
@@ -14,9 +14,9 @@ interface FilmRepository {
         director: String,
     ): Film
 
-    fun updateFilm(film: Film)
+    suspend fun updateFilm(film: Film)
 
-    fun deleteFilm(id: String)
+    suspend fun deleteFilm(id: String)
 
     suspend fun refresh(): Result<Unit>
 }

@@ -3,18 +3,23 @@ package com.example.filmcollection.data
 import com.example.filmcollection.data.remote.FilmRemoteDataSource
 import com.example.filmcollection.model.Film
 import java.util.UUID
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
+/**
+ * Тестовый fake-репозиторий. В проде используется [RoomFilmRepository].
+ */
 class InMemoryFilmRepository(
     initialFilms: List<Film> = emptyList(),
     private val remoteDataSource: FilmRemoteDataSource? = null,
 ) : FilmRepository {
     private val _films = MutableStateFlow(initialFilms)
-    override val films: StateFlow<List<Film>> = _films
+    override val films: Flow<List<Film>> = _films
 
-    override fun addFilm(
+    fun currentFilms(): List<Film> = _films.value
+
+    override suspend fun addFilm(
         title: String,
         year: Int,
         genre: String,
@@ -33,13 +38,13 @@ class InMemoryFilmRepository(
         return film
     }
 
-    override fun updateFilm(film: Film) {
+    override suspend fun updateFilm(film: Film) {
         _films.update { current ->
             current.map { if (it.id == film.id) film else it }
         }
     }
 
-    override fun deleteFilm(id: String) {
+    override suspend fun deleteFilm(id: String) {
         _films.update { current -> current.filterNot { it.id == id } }
     }
 

@@ -3,10 +3,11 @@ package com.example.filmcollection.data.remote
 import com.example.filmcollection.model.Film
 import com.example.filmcollection.network.FilmApi
 import com.example.filmcollection.network.dto.MovieDto
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class RetrofitFilmRemoteDataSource(
+class RetrofitFilmRemoteDataSource @Inject constructor(
     private val api: FilmApi,
 ) : FilmRemoteDataSource {
 

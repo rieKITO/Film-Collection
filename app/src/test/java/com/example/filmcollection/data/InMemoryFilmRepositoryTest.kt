@@ -13,7 +13,7 @@ import org.junit.Test
 class InMemoryFilmRepositoryTest {
 
     @Test
-    fun addFilm_addsItemToCollection() {
+    fun addFilm_addsItemToCollection() = runTest {
         val repository = InMemoryFilmRepository()
 
         repository.addFilm(
@@ -24,14 +24,14 @@ class InMemoryFilmRepositoryTest {
             director = "Christopher Nolan",
         )
 
-        val films = repository.films.value
+        val films = repository.currentFilms()
         assertEquals(1, films.size)
         assertEquals("Interstellar", films.first().title)
         assertTrue(films.first().id.isNotBlank())
     }
 
     @Test
-    fun updateFilm_updatesExistingItem() {
+    fun updateFilm_updatesExistingItem() = runTest {
         val repository = InMemoryFilmRepository()
         repository.addFilm(
             title = "Old Title",
@@ -40,16 +40,16 @@ class InMemoryFilmRepositoryTest {
             country = "UK",
             director = "Director A",
         )
-        val existing = repository.films.value.first()
+        val existing = repository.currentFilms().first()
 
         repository.updateFilm(existing.copy(title = "New Title"))
 
-        val updated = repository.films.value.first()
+        val updated = repository.currentFilms().first()
         assertEquals("New Title", updated.title)
     }
 
     @Test
-    fun deleteFilm_removesItemFromCollection() {
+    fun deleteFilm_removesItemFromCollection() = runTest {
         val repository = InMemoryFilmRepository()
         repository.addFilm(
             title = "Film to Delete",
@@ -58,12 +58,11 @@ class InMemoryFilmRepositoryTest {
             country = "France",
             director = "Director B",
         )
-        val existing = repository.films.value.first()
+        val existing = repository.currentFilms().first()
 
         repository.deleteFilm(existing.id)
 
-        val films = repository.films.value
-        assertTrue(films.isEmpty())
+        assertTrue(repository.currentFilms().isEmpty())
     }
 
     @Test
@@ -91,7 +90,7 @@ class InMemoryFilmRepositoryTest {
         val result = repository.refresh()
 
         assertTrue(result.isSuccess)
-        val films = repository.films.value
+        val films = repository.currentFilms()
         assertEquals(1, films.size)
         val merged = films.first()
         assertEquals("Remote Title", merged.title)
@@ -125,10 +124,10 @@ class InMemoryFilmRepositoryTest {
 
         repository.refresh()
 
-        val titles = repository.films.value.map { it.title }
+        val titles = repository.currentFilms().map { it.title }
         assertTrue(titles.contains("From Server"))
         assertTrue(titles.contains("My Film"))
-        assertNotNull(repository.films.value.firstOrNull { it.id == userFilm.id })
+        assertNotNull(repository.currentFilms().firstOrNull { it.id == userFilm.id })
     }
 
     @Test
@@ -150,7 +149,7 @@ class InMemoryFilmRepositoryTest {
 
         repository.refresh()
 
-        assertNull(repository.films.value.firstOrNull { it.id == "remote-1" })
+        assertNull(repository.currentFilms().firstOrNull { it.id == "remote-1" })
     }
 
     @Test

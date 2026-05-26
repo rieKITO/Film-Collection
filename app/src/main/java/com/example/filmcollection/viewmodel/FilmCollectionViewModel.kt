@@ -4,23 +4,33 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.filmcollection.data.FilmRepository
 import com.example.filmcollection.model.Film
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 
-class FilmCollectionViewModel(
+@HiltViewModel
+class FilmCollectionViewModel @Inject constructor(
     private val repository: FilmRepository,
-    private val autoRefreshIntervalMillis: Long = DEFAULT_AUTO_REFRESH_INTERVAL_MILLIS,
 ) : ViewModel() {
+
     val films: StateFlow<List<Film>> = repository.films
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(STATE_TIMEOUT_MILLIS),
+            initialValue = emptyList(),
+        )
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
@@ -45,28 +55,28 @@ class FilmCollectionViewModel(
         genre: String,
         country: String,
         director: String,
-    ): Film {
-        return repository.addFilm(
-            title = title,
-            year = year,
-            genre = genre,
-            country = country,
-            director = director,
-        )
+    ) {
+        viewModelScope.launch {
+            repository.addFilm(
+                title = title,
+                year = year,
+                genre = genre,
+                country = country,
+                director = director,
+            )
+        }
     }
 
     fun updateFilm(film: Film) {
-        repository.updateFilm(film)
+        viewModelScope.launch { repository.updateFilm(film) }
     }
 
     fun deleteFilm(id: String) {
-        repository.deleteFilm(id)
+        viewModelScope.launch { repository.deleteFilm(id) }
     }
 
     fun refresh() {
-        viewModelScope.launch {
-            performRefresh()
-        }
+        viewModelScope.launch { performRefresh() }
     }
 
     fun showSnackbar(message: String) {
@@ -89,13 +99,14 @@ class FilmCollectionViewModel(
         autoRefreshJob?.cancel()
         autoRefreshJob = viewModelScope.launch {
             while (isActive) {
-                delay(autoRefreshIntervalMillis)
+                delay(AUTO_REFRESH_INTERVAL_MILLIS)
                 performRefresh()
             }
         }
     }
 
     companion object {
-        private const val DEFAULT_AUTO_REFRESH_INTERVAL_MILLIS: Long = 60_000L
+        private const val AUTO_REFRESH_INTERVAL_MILLIS: Long = 60_000L
+        private const val STATE_TIMEOUT_MILLIS: Long = 5_000L
     }
 }
